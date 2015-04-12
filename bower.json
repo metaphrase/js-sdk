@@ -1,0 +1,21 @@
+{
+  "name": "metaphrase/js-sdk",
+  "version": "0.0.1",
+  "homepage": "https://github.com/metaphrase/js-sdk",
+  "authors": [
+    "Xenofon Spafaridis <nohponex@gmail.com>"
+  ],
+  "description": "Javascript SDK for metaphrase",
+  "main": "src/metaphrase.js",
+  "keywords": [
+    "localization"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
