@@ -5,7 +5,8 @@
  */
 (function() {
   var metaphrase = function(params) {
-    console.log('metaphrase');
+
+    params = typeof(params) !== 'undefined' ? params : {};
 
     //projectId and API_KEY are required
     ['projectId', 'API_KEY'].forEach(function(p) {
@@ -84,9 +85,9 @@
 
           console.log('from cache..');
 
-          if (this.parameters.onLoad) {
-            this.parameters.onLoad(this);
-          }
+          //if (this.parameters.onLoad) {
+          //  this.parameters.onLoad(this);
+          //}
 
         } else {
           //TODO
@@ -99,8 +100,14 @@
         temp = null;
       }
     }
+    var me = this;
+
     if (!temp) {
-      this.fetch();
+      this.fetch(function() {
+        me.metaphrasePage();
+      });
+    } else {
+      me.metaphrasePage();
     }
   };
 
@@ -108,8 +115,9 @@
    * Fetch translated strings
    * @return {[type]} [description]
    */
-  metaphrase.prototype.fetch = function() {
-    console.log('fetch');
+  metaphrase.prototype.fetch = function(callback) {
+    var me = this;
+
     var request = new XMLHttpRequest();
     request.open('GET',
       this.API_BASE + 'fetch/listing/?id=' + this.parameters.projectId +
@@ -120,8 +128,11 @@
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
         //todo add try catch
-        this.translation = JSON.parse(request.responseText);
-        console.log(this.translation);
+        me.translation = JSON.parse(request.responseText).translation;
+
+        if (callback) {
+          callback();
+        }
       }
 
     };
@@ -137,7 +148,8 @@
    * @param  {[type]} element [description]
    * @return {[type]}         [description]
    */
-  metaphrase.prototype.metaphrase = function(element) {
+  metaphrase.prototype.metaphrasePage = function(element) {
+
     element = typeof(element) !== 'undefined' ? element : document;
 
     var me = this;
@@ -145,8 +157,8 @@
 
     //Replace all keys with the translated values
     [].forEach.call(elements, function(el, i) {
-      console.log(el);
       var key = el.getAttribute('data-i18');
+
       if (key) {
         var parameters = null;
         if (el.getAttribute('data-i18-data')) {
@@ -234,7 +246,7 @@
    * @param  {[type]} keyword [description]
    * @return {[type]}         [description]
    */
-  metaphrase.prototype.addKey = function(keyword) {
+  metaphrase.prototype.addKey = function(keyword, metadata) {
     //TOOD
   };
 

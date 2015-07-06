@@ -6,3 +6,5 @@ languages:
 exclude_paths:
  - "build/*"
  - "tests/"
+ - "test/"
+ - "example/"

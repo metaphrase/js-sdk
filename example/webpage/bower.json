@@ -1,5 +1,7 @@
 {
-  "name": "metaphrase-js",
+  "name": "metaphrase-js-example",
+  "private": true,
+  "version": "0.0.1",
   "homepage": "https://github.com/metaphrase/metaphrase-js",
   "authors": [
     "Xenofon Spafaridis <nohponex@gmail.com>"
@@ -12,17 +14,16 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "Gruntfile.js",
-    "spec",
-    "bower.json",
     "node_modules",
     "bower_components",
     "test",
-    "tests",
-    "examples"
+    "tests"
   ],
   "moduleType": [
     "globals",
     "node"
-  ]
+  ],
+  "devDependencies": {
+    "metaphrase-js": "~0.0.1"
+  }
 }
