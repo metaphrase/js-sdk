@@ -1,13 +1,11 @@
 {
   "name": "metaphrase-js-example",
   "private": true,
-  "version": "0.0.1",
   "homepage": "https://github.com/metaphrase/metaphrase-js",
   "authors": [
     "Xenofon Spafaridis <nohponex@gmail.com>"
   ],
-  "description": "Javascript SDK for metaphrase",
-  "main": "src/metaphrase.js",
+  "description": "Example forJavascript SDK for metaphrase",
   "keywords": [
     "localization"
   ],
@@ -24,6 +22,6 @@
     "node"
   ],
   "devDependencies": {
-    "metaphrase-js": "~0.0.1"
+    "metaphrase-js": "^0.0.1"
   }
 }

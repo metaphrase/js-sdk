@@ -6,16 +6,14 @@
   /**
    * Create a new metaphrase object.
    * @class
-   * @constructor
    * @global
-   * @this {metaphrase}
-   * @param  {Object} params Initialization parameters.
-   * @param  {!number} params.projectId Project's id.
-   * @param  {!string} params.API_KEY Your API key.
-   * @param  {string} [params.language=en] Language to use.
-   * @param  {number} [params.cacheTTL=3600000] Cache title to live.
-   * @param  {string} [params.language] Language to use.
-   * @param  {boolean} [params.reportMissingKeys=false] Report missing keys to serice.
+   * @param  {Object}   params                            Initialization parameters.
+   * @param  {!number}  params.projectId                  Project's id.
+   * @param  {!string}  params.API_KEY                    Your API key.
+   * @param  {string}   [params.language=en]              Language to use.
+   * @param  {number}   [params.cacheTTL=3600000]         Cache title to live.
+   * @param  {string}   [params.language]                 Language to use.
+   * @param  {boolean}  [params.reportMissingKeys=false]  Report missing keys to serice.
    * @throws Throws exception when params.projectId or params.API_KEY is not set
    */
   var metaphrase = function(params) {
@@ -43,9 +41,7 @@
       reportMissingKeys: false
     };
 
-    /** @constant {string}
-        Base url of API service
-    */
+    //Base url of API service
     this.API_BASE = 'https://translate.nohponex.gr/';
 
     //copy given param to parameters object
@@ -168,9 +164,9 @@
    */
 
   /**
-   * Metaphrase a DOM element's children
+   * Translate a DOM element's children.
    *
-   * @param  {Element} [element=document] Parent HTML element
+   * @param  {Element} [element=document] Parent HTML element, use document to translate the entire page.
    * @memberof metaphrase
    */
   metaphrase.prototype.metaphrasePage = function(element) {
