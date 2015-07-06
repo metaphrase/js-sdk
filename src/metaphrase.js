@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 (function() {
-  var Metaphrase = function(params) {
-    var missingKeys = [];
+  var metaphrase = function(params) {
+    console.log('metaphrase');
 
+    //projectId and API_KEY are required
     ['projectId', 'API_KEY'].forEach(function(p) {
       if (!params.hasOwnProperty(p)) {
         throw 'Parameter ' + p + ' is required!';
@@ -19,35 +20,42 @@
      */
     this.parameters = {
       projectId: null,
-      language: 'en',
+      language: 'en', //English
       API_KEY: null,
       onLoad: null,
-      translationStorageType: sessionStorage,
-      cacheTTL: 3600000
+      cacheType: null,
+      cacheTTL: 3600000, //in milliseconds
+      reportMissingKeys: true
     };
 
+    //Base url of API service
     this.API_BASE = 'https://translate.nohponex.gr/';
 
     //copy given param to parameters object
     for (var p in params) {
       if (params.hasOwnProperty(p) && this.parameters.hasOwnProperty(p)) {
-        this.parameters[key] = params[key];
+        this.parameters[p] = params[p];
       }
     }
 
     //Current language
     this.language = this.parameters.language;
 
+    //Store missing keys
+    this.missingKeys = [];
+
     //Current translation key : translation
     this.translation = [];
 
-    var apiURL = this.API_BASE + 'fetch/listing/?id=' + this.parameters.projectId +
-      '&language=' + this.language + '&api_key=' + this.parameters.API_KEY;
+    var apiURL = this.API_BASE + 'fetch/listing/?id=' +
+      this.parameters.projectId + '&language=' + this.language +
+      '&api_key=' + this.parameters.API_KEY;
 
     //storage
     //Check sessionStorage
-    var temp = (typeof(sessionStorage) !== 'undefined') ? sessionStorage.getItem(
-      apiURL) : null;
+    var temp =
+      (typeof(sessionStorage) !== 'undefined') ?
+      sessionStorage.getItem(apiURL) : null;
 
     //Check localStorage
     if (!temp && typeof(localStorage) !== 'undefined') {
@@ -69,7 +77,7 @@
         var diff = (new Date() - new Date(temp.date));
 
         //Check strored translation's date
-        if (diff < this.parameters.cache_duration) {
+        if (diff < this.parameters.cacheTTL) {
 
           this.language = temp.language;
           this.translation = temp.translation;
@@ -97,21 +105,11 @@
   };
 
   /**
-   * Metaphrase an DOM element's children
-   * @param  {[type]} element [description]
-   * @return {[type]}         [description]
-   */
-  Metaphrase.prototype.metaphrase = function(element) {
-    element = typeof(element) !== 'undefined' ? element : document;
-
-    var elements = element.querySelectorAll('[data-i18]');
-  };
-
-  /**
    * Fetch translated strings
    * @return {[type]} [description]
    */
-  Metaphrase.prototype.fetch = function() {
+  metaphrase.prototype.fetch = function() {
+    console.log('fetch');
     var request = new XMLHttpRequest();
     request.open('GET',
       this.API_BASE + 'fetch/listing/?id=' + this.parameters.projectId +
@@ -121,7 +119,9 @@
 
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
-        JSON.parse(request.responseText);
+        //todo add try catch
+        this.translation = JSON.parse(request.responseText);
+        console.log(this.translation);
       }
 
     };
@@ -133,27 +133,83 @@
   };
 
   /**
+   * Metaphrase an DOM element's children
+   * @param  {[type]} element [description]
+   * @return {[type]}         [description]
+   */
+  metaphrase.prototype.metaphrase = function(element) {
+    element = typeof(element) !== 'undefined' ? element : document;
+
+    var me = this;
+    var elements = element.querySelectorAll('[data-i18]');
+
+    //Replace all keys with the translated values
+    [].forEach.call(elements, function(el, i) {
+      console.log(el);
+      var key = el.getAttribute('data-i18');
+      if (key) {
+        var parameters = null;
+        if (el.getAttribute('data-i18-data')) {
+          //Parse string as json object
+          parameters = JSON.parse(el.getAttribute('data-i18-data'));
+        }
+
+        var t = me.metaphraseKeyword(key, parameters);
+
+        if (t) { //If translation is available
+          //Replace element's text
+          el.innerHTML = t;
+          //If translation is not available and element is empty
+        } else if (!el.innerHTML) {
+          elinnerHTML = key;
+        }
+      }
+    });
+
+    //Replace all data-i18-title
+    elements = element.querySelectorAll('[data-i18-title]');
+
+    [].forEach.call(elements, function(el, i) {
+      //Get elements key
+      var key = el.getAttribute('data-i18-title');
+
+      if (key) {
+        var t = me.metaphraseKeyword(key);
+
+        if (t) { //If translation is available
+          //Replace element's text
+          el.setAttribute('title', t);
+          //If translation is not available and element is empty
+        } else if (!el.getAttribute('title')) {
+          el.setAttribute('title', key);
+        }
+      }
+    });
+
+  };
+
+  /**
    * Metaphrase a keyword
    * @param  {[type]} keyword    [description]
    * @param  {[type]} parameters [description]
    * @return {[type]}            [description]
    */
-  Metaphrase.prototype.metaphraseKeyword = function(keyword, parameters) {
+  metaphrase.prototype.metaphraseKeyword = function(keyword, parameters) {
     parameters = typeof(parameters) !== 'undefined' ? parameters : null;
 
-    var t = this.translation[key];
+    var t = this.translation[keyword];
 
     //If translation is not set
     if (!t) {
 
       //On missing key add request
-      if (this.missingKeys.indexOf(key) < 0) {
+      if (this.missingKeys.indexOf(keyword) < 0) {
 
         //Add key to missing key list
-        this.missingKeys.push(key);
+        this.missingKeys.push(keyword);
 
         //Add key to API
-        this.addKey(key);
+        this.addKey(keyword);
 
       }
 
@@ -173,14 +229,19 @@
     return t;
   };
 
-  Metaphrase.prototype.addKey = function(keyword) {
+  /**
+   * Add missing key
+   * @param  {[type]} keyword [description]
+   * @return {[type]}         [description]
+   */
+  metaphrase.prototype.addKey = function(keyword) {
     //TOOD
   };
 
-  //Expose Metaphrase SDK class to window (for browsers) or exports (for nodejs)
-  if (typeof window === 'undefined') {
-    exports.Metaphrase = Metaphrase;
+  //Expose metaphrase SDK class to window (for browsers) or exports (for nodejs)
+  if (typeof(window) === 'undefined') {
+    exports.metaphrase = metaphrase;
   } else {
-    window.Metaphrase = Metaphrase;
+    window.metaphrase = metaphrase;
   }
 })();

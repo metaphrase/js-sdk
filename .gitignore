@@ -1,9 +1,5 @@
-composer.phar
-vendor/
 node_modules
 npm-debug.log
 bower_components
-test
-tests
 /nbproject/private/
 /nbproject/

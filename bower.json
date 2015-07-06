@@ -19,6 +19,7 @@
     "tests"
   ],
   "moduleType": [
-    "globals"
+    "globals",
+    "node"
   ]
 }
