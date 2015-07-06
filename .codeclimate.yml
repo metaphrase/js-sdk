@@ -9,3 +9,5 @@ exclude_paths:
  - "test/"
  - "example/"
  - "examples/"
+ - "dist/"
+ - "doc/"
