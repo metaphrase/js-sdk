@@ -31,8 +31,68 @@
     //copy given param to parameters object
     for (var p in params) {
       if (params.hasOwnProperty(p) && this.parameters.hasOwnProperty(p)) {
-        parameters[key] = params[key];
+        this.parameters[key] = params[key];
       }
+    }
+
+    //Current language
+    this.language = this.parameters.language;
+
+    //Current translation key : translation
+    this.translation = [];
+
+    var apiURL = this.API_BASE + 'fetch/listing/?id=' + this.parameters.projectId +
+      '&language=' + this.language + '&api_key=' + this.parameters.API_KEY;
+
+    //storage
+    //Check sessionStorage
+    var temp = (typeof(sessionStorage) !== 'undefined') ? sessionStorage.getItem(
+      apiURL) : null;
+
+    //Check localStorage
+    if (!temp && typeof(localStorage) !== 'undefined') {
+      temp = localStorage.getItem(apiURL);
+    }
+
+    //Use cached translation
+    if (temp) {
+
+      //Parse as json from session storage
+      try {
+        temp = JSON.parse(temp);
+
+        if (!temp.date) {
+          throw 'date not set';
+        }
+
+        //Time difference in milliseconds
+        var diff = (new Date() - new Date(temp.date));
+
+        //Check strored translation's date
+        if (diff < this.parameters.cache_duration) {
+
+          this.language = temp.language;
+          this.translation = temp.translation;
+
+          console.log('from cache..');
+
+          if (this.parameters.onLoad) {
+            this.parameters.onLoad(this);
+          }
+
+        } else {
+          //TODO
+          localStorage.removeItem(apiURL);
+          sessionStorage.removeItem(apiURL);
+
+          temp = null;
+        }
+      } catch (e) {
+        temp = null;
+      }
+    }
+    if (!temp) {
+      this.fetch();
     }
   };
 
@@ -79,13 +139,48 @@
    * @return {[type]}            [description]
    */
   Metaphrase.prototype.metaphraseKeyword = function(keyword, parameters) {
+    parameters = typeof(parameters) !== 'undefined' ? parameters : null;
 
+    var t = this.translation[key];
+
+    //If translation is not set
+    if (!t) {
+
+      //On missing key add request
+      if (this.missingKeys.indexOf(key) < 0) {
+
+        //Add key to missing key list
+        this.missingKeys.push(key);
+
+        //Add key to API
+        this.addKey(key);
+
+      }
+
+      return null;
+
+    }
+
+    //If parameters are set
+    if (parameters) {
+      for (var k in parameters) {
+        if (parameters.hasOwnProperty(k)) {
+          t = t.replace('%' + k + '%', parameters[k]);
+        }
+      }
+    }
+
+    return t;
   };
 
-  //Expose Solver class to window (for browsers) or exports (for nodejs)
+  Metaphrase.prototype.addKey = function(keyword) {
+    //TOOD
+  };
+
+  //Expose Metaphrase SDK class to window (for browsers) or exports (for nodejs)
   if (typeof window === 'undefined') {
-    exports.Solver = Solver;
+    exports.Metaphrase = Metaphrase;
   } else {
-    window.Solver = Solver;
+    window.Metaphrase = Metaphrase;
   }
 })();
