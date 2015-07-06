@@ -1,2 +1,2 @@
-# js-sdk
-Javascript SDK for metaphrase
+# metaphrase-js
+Javascript SDK for metaphrase service

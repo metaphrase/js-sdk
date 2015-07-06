@@ -7,7 +7,7 @@
   var Metaphrase = function(params) {
     var missingKeys = [];
 
-    [projectId, API_KEY].forEach(function(p) {
+    ['projectId', 'API_KEY'].forEach(function(p) {
       if (!params.hasOwnProperty(p)) {
         throw 'Parameter ' + p + ' is required!';
       }
@@ -43,7 +43,6 @@
    */
   Metaphrase.prototype.metaphrase = function(element) {
     element = typeof(element) !== 'undefined' ? element : document;
-
 
     var elements = element.querySelectorAll('[data-i18]');
   };
