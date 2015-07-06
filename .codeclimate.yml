@@ -8,3 +8,4 @@ exclude_paths:
  - "tests/"
  - "test/"
  - "example/"
+ - "examples/"

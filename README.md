@@ -1,11 +1,12 @@
 # metaphrase-js
 Javascript SDK for metaphrase service
 
+Metaphrase is a
 Currently metaphrase is not available for public.
 
 ##Install using bower
 
-```bash
+```shell
 bower install metaphrase-js --save
 ```
 
@@ -20,13 +21,11 @@ Add scripts at the end of the body
       language: 'en',
       API_KEY: 'XXXXXXXXXXXXXXXXXXXXXXXX',
     });
-
-    m.metaphrase();
   })();
 </script>
 ```
 
-This will translate all keywords inside the html document to `English`
+This will translate all keywords inside the HTML document to `English`
 for example
 
 ```html
