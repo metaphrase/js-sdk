@@ -1,0 +1,28 @@
+{
+  "name": "metaphrase-js",
+  "homepage": "https://github.com/metaphrase/metaphrase-js",
+  "authors": [
+    "Xenofon Spafaridis <nohponex@gmail.com>"
+  ],
+  "description": "Javascript SDK for metaphrase",
+  "main": "src/metaphrase.js",
+  "keywords": [
+    "localization"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "Gruntfile.js",
+    "spec",
+    "bower.json",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "examples"
+  ],
+  "moduleType": [
+    "globals",
+    "node"
+  ]
+}
