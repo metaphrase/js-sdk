@@ -16,11 +16,14 @@
     "spec",
     "bower.json",
     "node_modules",
+    "package.json",
     "bower_components",
     "test",
     "tests",
     "example",
-    "examples"
+    "examples",
+    "src",
+    "doc"
   ],
   "moduleType": [
     "globals",

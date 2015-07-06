@@ -2,7 +2,19 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
+    concat: {
+      dist: {
+        src: ['src/*.js'],
+        dest: 'dist/metaphrase.js',
+      }
+    },
+    uglify: {
+      build: {
+        files: {
+          'dist/metaphrase.min.js': ['dist/metaphrase.js']
+        }
+      }
+    },
     watch: {
       scripts: {
         files: 'src/**/*',
@@ -30,6 +42,14 @@ module.exports = function(grunt) {
       options: {
         jshintrc: '.jshintrc'
       }
+    },
+    jsdoc: {
+      dist: {
+        src: ['src/**/*.js'],
+        options: {
+          destination: 'doc'
+        }
+      }
     }
 
   });
@@ -37,9 +57,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-jscs');
 
-  grunt.registerTask('default', ['jscs', 'jshint']); //test
-  grunt.registerTask('+w', ['jscs', 'jshint', 'watch']); //test
-  grunt.registerTask('build', ['jscs']);
+  grunt.registerTask('default', ['jscs', 'jshint']);
+  grunt.registerTask('doc', ['jsdoc']);
+  grunt.registerTask('+w', ['jscs', 'jshint', 'watch']);
+  grunt.registerTask('build', ['jscs', 'jshint', 'doc',
+    'concat', 'uglify'
+  ]);
 };
