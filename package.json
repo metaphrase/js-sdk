@@ -1,21 +1,21 @@
 {
-  "name": "Metaphrase_js-sdk",
+  "name": "metaphrase-js",
   "version": "0.0.1",
   "description": "Javascript SDK for metaphrase service",
-  "main": "index.js",
+  "main": "src/metaphrase.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/metaphrase/js-sdk.git"
+    "url": "https://github.com/metaphrase/metaphrase-js.git"
   },
   "author": "Xenophon Spafaridis <nohponex@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/metaphrase/js-sdk/issues"
+    "url": "https://github.com/metaphrase/metaphrase-jsissues"
   },
-  "homepage": "https://github.com/metaphrase/js-sdk",
+  "homepage": "https://github.com/metaphrase/metaphrase-js",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.1",

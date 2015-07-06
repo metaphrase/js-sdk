@@ -1,7 +1,7 @@
 {
-  "name": "metaphrase/js-sdk",
+  "name": "metaphrase-js",
   "version": "0.0.1",
-  "homepage": "https://github.com/metaphrase/js-sdk",
+  "homepage": "https://github.com/metaphrase/metaphrase-js",
   "authors": [
     "Xenofon Spafaridis <nohponex@gmail.com>"
   ],
