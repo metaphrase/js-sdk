@@ -81,11 +81,25 @@
 </head>
 
 <body>
-  <div class="pull-right">
-    <a href="#" class="button" data-i18="sign_up_btn"></a>
-    <a href="#" class="button button-green" data-i18="login_btn"></a>
+  <div>
+    <div class="pull-right">
+      <a href="#" class="button" data-i18="sign_up_btn"></a>
+      <a href="#" class="button button-green" data-i18="login_btn"></a>
+      Current language: <span data-i18-lang></span>
+    </div>
+    <span data-i18="switch_language" data-i18-title="switch_language_title">
+      switch_language
+    </span>
+    <button type="button" onclick="window.m.switchLanguage('gr');">
+      Language : gr <span class="flag flag-gr"></span>
+    </button>
+    <button type="button" onclick="window.m.switchLanguage('en');">
+      Language : en <span class="flag flag-en"></span>
+    </button>
+    <button type="button" onclick="window.m.switchLanguage('de');">
+      Language : de <span class="flag flag-de"></span>
+    </button>
   </div>
-  <hr/>
   <div class="container">
     <h1 data-i18="heading_title">Heading title</h1>
     <h2 data-i18="heading_subtitle">Heading subtitle</h2>
@@ -93,6 +107,9 @@
 
     <p id="introduction_body" data-i18="introduction_body_text">
       Introduction body
+    </p>
+
+    <p data-i18="you_have_N_new_offers" data-i18-data='{"offers":10}'>
     </p>
 
     <div class="center">
@@ -123,6 +140,9 @@
         API_KEY: '614a98a31bd17b3a82094ef0388b9d81',
         cache_duration: 1
       });
+
+      //expose to window as global object
+      window.m = m;
     })();
   </script>
 </body>

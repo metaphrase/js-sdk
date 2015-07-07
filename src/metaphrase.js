@@ -28,7 +28,7 @@
     });
 
     /**
-     * parameters default
+     * Default parameters object.
      * @type {Object}
      */
     this.parameters = {
@@ -60,11 +60,23 @@
     //Current translation key : translation
     this.translation = [];
 
+    //load selected language
+    this.switchLanguage(this.language);
+
+  };
+
+  /**
+   * Switch to language, use this language, fetch the translated keyword and translated the page.
+   * @param  {string} language Use this language's translations.
+   */
+  metaphrase.prototype.switchLanguage = function(language) {
+
+    this.language = language;
+
     var apiURL = this.API_BASE + 'fetch/listing/?id=' +
       this.parameters.projectId + '&language=' + this.language +
       '&api_key=' + this.parameters.API_KEY;
 
-    //storage
     //Check sessionStorage
     var temp =
       (typeof(sessionStorage) !== 'undefined') ?
@@ -92,7 +104,7 @@
         //Check strored translation's date
         if (diff < this.parameters.cacheTTL) {
 
-          this.language = temp.language;
+          //this.language = temp.language;
           this.translation = temp.translation;
 
           console.log('from cache..');
@@ -102,7 +114,7 @@
           //}
 
         } else {
-          //TODO
+          //clear storage
           localStorage.removeItem(apiURL);
           sessionStorage.removeItem(apiURL);
 
@@ -115,7 +127,10 @@
     var me = this;
 
     if (!temp) {
-      this.fetch(function() {
+      this.fetch(this.language, function(err, lang, translations) {
+        if (err) {
+          return;
+        }
         me.metaphrasePage();
       });
     } else {
@@ -126,17 +141,18 @@
   /**
    * Fetch translated strings from service's remote API
    *
-   * @param {requestCallback} cb - The callback that handles the response.
+   * @param {string} language Fetch translations in this language.
+   * @param {requestCallback} [cb] The callback that handles the response.
    * @this {metaphrase}
    * @memberof metaphrase
    */
-  metaphrase.prototype.fetch = function(cb) {
+  metaphrase.prototype.fetch = function(language, cb) {
     var me = this;
 
     var request = new XMLHttpRequest();
     request.open('GET',
       this.API_BASE + 'fetch/listing/?id=' + this.parameters.projectId +
-      '&language=' + this.parameters.language + '&api_key=' + this.parameters
+      '&language=' + language + '&api_key=' + this.parameters
       .API_KEY,
       true);
 
@@ -145,14 +161,17 @@
         //todo add try catch
         me.translation = JSON.parse(request.responseText).translation;
 
+        //if callback is set, call it
         if (cb) {
-          cb();
+          cb(null, language, me.translation);
         }
       }
 
     };
 
-    request.onerror = function() {};
+    request.onerror = function() {
+      cb('error');
+    };
 
     request.send();
 
@@ -161,6 +180,9 @@
   /**
    * This callback is displayed as a global member.
    * @callback requestCallback
+   * @param {string} err Error
+   * @param {string} language Language of fetched translations.
+   * @param {object} translation Trasnlated keywords object.
    */
 
   /**
@@ -173,7 +195,6 @@
 
     element = typeof(element) !== 'undefined' ? element : document;
 
-    var me = this;
     var elements = element.querySelectorAll('[data-i18]');
 
     //Replace all keys with the translated values
@@ -183,21 +204,25 @@
       if (key) {
         var parameters = null;
         if (el.getAttribute('data-i18-data')) {
-          //Parse string as json object
-          parameters = JSON.parse(el.getAttribute('data-i18-data'));
+          try {
+            //Parse string as json object
+            parameters = JSON.parse(el.getAttribute('data-i18-data'));
+          } catch (e) {
+            parameters = null;
+          }
         }
 
-        var t = me.metaphraseKeyword(key, parameters);
+        var t = this.metaphraseKeyword(key, parameters);
 
         if (t) { //If translation is available
           //Replace element's text
           el.innerHTML = t;
           //If translation is not available and element is empty
         } else if (!el.innerHTML) {
-          elinnerHTML = key;
+          el.innerHTML = key;
         }
       }
-    });
+    }, this);
 
     //Replace all data-i18-title
     elements = element.querySelectorAll('[data-i18-title]');
@@ -207,7 +232,7 @@
       var key = el.getAttribute('data-i18-title');
 
       if (key) {
-        var t = me.metaphraseKeyword(key);
+        var t = this.metaphraseKeyword(key);
 
         if (t) { //If translation is available
           //Replace element's text
@@ -217,8 +242,14 @@
           el.setAttribute('title', key);
         }
       }
-    });
+    }, this);
 
+    //Replace all data-i18-lang
+    elements = element.querySelectorAll('[data-i18-lang]');
+    [].forEach.call(elements, function(el, i) {
+      //Set current language as text
+      el.innerHTML = this.language;
+    }, this);
   };
 
   /**
