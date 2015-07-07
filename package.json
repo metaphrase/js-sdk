@@ -23,5 +23,8 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-jscs": "^1.8.0",
     "grunt-jsdoc": "^0.6.7"
+  },
+  "dependencies": {
+    "xmlhttprequest": "^1.7.0"
   }
 }

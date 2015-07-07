@@ -35,7 +35,6 @@
       projectId: null,
       language: 'en', //English
       API_KEY: null,
-      onLoad: null,
       cacheType: null,
       cacheTTL: 3600000, //in milliseconds
       reportMissingKeys: false
@@ -61,17 +60,40 @@
     this.translation = [];
 
     //load selected language
-    this.switchLanguage(this.language);
+    //this.switchLanguage(this.language);
 
+    this.onLoad = [];
+  };
+
+  metaphrase.prototype.onLoadSubscribe = function(fn) {
+    this.onLoad.push(fn);
+  };
+
+  metaphrase.prototype.unsubscribe = function(fn) {
+    this.onLoad = this.onLoad.filter(
+      function(item) {
+        if (item !== fn) {
+          return item;
+        }
+      }
+    );
+  };
+
+  metaphrase.prototype.onLoadfire = function(o, thisObj) {
+    var scope = thisObj; // || window || exports;
+    this.onLoad.forEach(function(item) {
+      item.call(scope, o);
+    });
   };
 
   /**
    * Switch to language, use this language, fetch the translated keyword and translated the page.
-   * @param  {string} language Use this language's translations.
+   * @param  {string|null} [language] Use this language's translations.
    */
   metaphrase.prototype.switchLanguage = function(language) {
-
-    this.language = language;
+    if (language) {
+      this.language = language;
+    }
 
     var apiURL = this.API_BASE + 'fetch/listing/?id=' +
       this.parameters.projectId + '&language=' + this.language +
@@ -131,10 +153,10 @@
         if (err) {
           return;
         }
-        me.metaphrasePage();
+        me.onLoadfire(me);
       });
     } else {
-      me.metaphrasePage();
+      me.onLoadfire(me);
     }
   };
 
@@ -309,6 +331,10 @@
   //Expose metaphrase SDK class to window (for browsers) or exports (for nodejs)
   if (typeof(window) === 'undefined') {
     exports.metaphrase = metaphrase;
+
+    if (typeof(XMLHttpRequest) === 'undefined') {
+      XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+    }
   } else {
     window.metaphrase = metaphrase;
   }

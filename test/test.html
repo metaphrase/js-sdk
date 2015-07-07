@@ -138,8 +138,16 @@
         projectId: 19,
         language: 'gr',
         API_KEY: '614a98a31bd17b3a82094ef0388b9d81',
-        cache_duration: 1
+        cacheTTL: 1
       });
+      //create a callback for onload
+      m.onLoadSubscribe(function(o) {
+        //translate the entire page on load
+        o.metaphrasePage();
+      });
+
+      //switch langauge
+      m.switchLanguage();
 
       //expose to window as global object
       window.m = m;
