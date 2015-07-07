@@ -17,11 +17,7 @@
     "test",
     "tests"
   ],
-  "moduleType": [
-    "globals",
-    "node"
-  ],
   "devDependencies": {
-    "metaphrase-js": "^0.0.1"
+    "metaphrase-js": "^0.1.0"
   }
 }
