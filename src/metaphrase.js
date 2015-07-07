@@ -7,14 +7,15 @@
    * Create a new metaphrase object.
    * @class
    * @global
-   * @param  {Object}   params                            Initialization parameters.
+   * @param  {!Object}  params                            Initialization parameters.
    * @param  {!number}  params.projectId                  Project's id.
    * @param  {!string}  params.API_KEY                    Your API key.
    * @param  {string}   [params.language=en]              Language to use.
    * @param  {number}   [params.cacheTTL=3600000]         Cache title to live.
    * @param  {string}   [params.language]                 Language to use.
    * @param  {boolean}  [params.reportMissingKeys=false]  Report missing keys to serice.
-   * @throws Throws exception when params.projectId or params.API_KEY is not set
+   * @throws Throws exception when params.projectId or params.API_KEY is not set.
+   * @todo add option to show keyword when translation is missing.
    */
   var metaphrase = function(params) {
 
@@ -59,38 +60,13 @@
     //Current translation key : translation
     this.translation = [];
 
-    //load selected language
-    //this.switchLanguage(this.language);
-
-    this.onLoad = [];
-  };
-
-  metaphrase.prototype.onLoadSubscribe = function(fn) {
-    this.onLoad.push(fn);
-  };
-
-  metaphrase.prototype.unsubscribe = function(fn) {
-    this.onLoad = this.onLoad.filter(
-      function(item) {
-        if (item !== fn) {
-          return item;
-        }
-      }
-    );
-  };
-
-  metaphrase.prototype.onLoadfire = function(o, thisObj) {
-    var scope = thisObj; // || window || exports;
-    this.onLoad.forEach(function(item) {
-      item.call(scope, o);
-    });
   };
 
   /**
    * Switch to language, use this language, fetch the translated keyword and translated the page.
    * @param  {string|null} [language] Use this language's translations.
    */
-  metaphrase.prototype.switchLanguage = function(language) {
+  metaphrase.prototype.switchLanguage = function(language, cb) {
     if (language) {
       this.language = language;
     }
@@ -100,63 +76,64 @@
       '&api_key=' + this.parameters.API_KEY;
 
     //Check sessionStorage
-    var temp =
+    var cached =
       (typeof(sessionStorage) !== 'undefined') ?
       sessionStorage.getItem(apiURL) : null;
 
     //Check localStorage
-    if (!temp && typeof(localStorage) !== 'undefined') {
-      temp = localStorage.getItem(apiURL);
+    if (!cached && typeof(localStorage) !== 'undefined') {
+      cached = localStorage.getItem(apiURL);
     }
 
-    //Use cached translation
-    if (temp) {
+    //Chech cached data
+    if (cached) {
 
       //Parse as json from session storage
       try {
-        temp = JSON.parse(temp);
+        cached = JSON.parse(cached);
 
-        if (!temp.date) {
+        if (!cached.date) {
           throw 'date not set';
         }
 
         //Time difference in milliseconds
-        var diff = (new Date() - new Date(temp.date));
+        var diff = (new Date() - new Date(cached.date));
 
         //Check strored translation's date
         if (diff < this.parameters.cacheTTL) {
 
-          //this.language = temp.language;
-          this.translation = temp.translation;
-
-          console.log('from cache..');
-
-          //if (this.parameters.onLoad) {
-          //  this.parameters.onLoad(this);
-          //}
+          //this.language = cached.language;
+          this.translation = cached.translation;
 
         } else {
           //clear storage
           localStorage.removeItem(apiURL);
           sessionStorage.removeItem(apiURL);
 
-          temp = null;
+          cached = null;
         }
       } catch (e) {
-        temp = null;
+        cached = null;
       }
     }
     var me = this;
 
-    if (!temp) {
+    //if cached version is available
+    if (cached) {
+      if (cb) {
+        cb(null, me);
+      }
+      //else fetch a 'fresh' copy
+    } else {
+
       this.fetch(this.language, function(err, lang, translations) {
         if (err) {
           return;
         }
-        me.onLoadfire(me);
+        if (cb) {
+          cb(null, me);
+        }
       });
-    } else {
-      me.onLoadfire(me);
     }
   };
 
@@ -192,7 +169,9 @@
     };
 
     request.onerror = function() {
-      cb('error');
+      if (cb) {
+        cb('error');
+      }
     };
 
     request.send();
@@ -272,6 +251,13 @@
       //Set current language as text
       el.innerHTML = this.language;
     }, this);
+
+    //Report missing keys
+    if (this.parameters.reportMissingKeys) {
+      this.missingKeys.forEach(function(item, index) {
+        this.addKey(item);
+      }, this);
+    }
   };
 
   /**
@@ -323,15 +309,46 @@
    * @memberof metaphrase
    * @param  {string} keyword Keyword.
    * @param  {Object} [metadata={}] Additional metadata.
+   * @todo Authenticate request.
+   * @todo Warning only for IE10+
    */
-  metaphrase.prototype.addKey = function(keyword, metadata) {
-    //TOOD
+  metaphrase.prototype.addKey = function(keyword, metadata, cb) {
+
+    var request = new XMLHttpRequest();
+    request.open('POST',
+      this.API_BASE + 'fetch/create/?id=' + this.parameters.projectId +
+      '&api_key=' + this.parameters
+      .API_KEY,
+      true);
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        //if callback is set, call it
+        console.log('added');
+        if (cb) {
+          cb(null);
+        }
+      }
+
+    };
+
+    request.onerror = function() {
+      if (cb) {
+        cb('error');
+      }
+    };
+
+    var data = new FormData();
+    data.append('key', keyword);
+
+    request.send(data);
   };
 
   //Expose metaphrase SDK class to window (for browsers) or exports (for nodejs)
   if (typeof(window) === 'undefined') {
     exports.metaphrase = metaphrase;
 
+    //XMLHttpRequest is not set in node.js load the, use the xmlhttprequest package
     if (typeof(XMLHttpRequest) === 'undefined') {
       XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
     }

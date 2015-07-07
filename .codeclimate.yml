@@ -5,9 +5,9 @@ languages:
   Python: false
 exclude_paths:
  - "build/*"
- - "tests/"
- - "test/"
- - "example/"
- - "examples/"
- - "dist/"
- - "doc/"
+ - "tests/*"
+ - "test/*"
+ - "example/*"
+ - "examples/*"
+ - "dist/*"
+ - "doc/*"

@@ -90,13 +90,13 @@
     <span data-i18="switch_language" data-i18-title="switch_language_title">
       switch_language
     </span>
-    <button type="button" onclick="window.m.switchLanguage('gr');">
+    <button type="button" onclick="window.m.switchLanguage('gr', window.metaphrase_update_page_cb);">
       Language : gr <span class="flag flag-gr"></span>
     </button>
-    <button type="button" onclick="window.m.switchLanguage('en');">
+    <button type="button" onclick="window.m.switchLanguage('en', window.metaphrase_update_page_cb);">
       Language : en <span class="flag flag-en"></span>
     </button>
-    <button type="button" onclick="window.m.switchLanguage('de');">
+    <button type="button" onclick="window.m.switchLanguage('de', window.metaphrase_update_page_cb);">
       Language : de <span class="flag flag-de"></span>
     </button>
   </div>
@@ -111,6 +111,7 @@
 
     <p data-i18="you_have_N_new_offers" data-i18-data='{"offers":10}'>
     </p>
+    <p data-i18="this_is_a_missing_key"></p>
 
     <div class="center">
       <a href="#" class="button button-lg" data-i18="tour_button">Tour</a>
@@ -140,14 +141,13 @@
         API_KEY: '614a98a31bd17b3a82094ef0388b9d81',
         cacheTTL: 1
       });
-      //create a callback for onload
-      m.onLoadSubscribe(function(o) {
-        //translate the entire page on load
-        o.metaphrasePage();
-      });
 
+      window.metaphrase_update_page_cb = function(err, o){
+        o.metaphrasePage();
+      };
+      
       //switch langauge
-      m.switchLanguage();
+      m.switchLanguage(null, window.metaphrase_update_page_cb);
 
       //expose to window as global object
       window.m = m;
