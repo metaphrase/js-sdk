@@ -324,7 +324,6 @@
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
         //if callback is set, call it
-        console.log('added');
         if (cb) {
           cb(null);
         }
